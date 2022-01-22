@@ -6,6 +6,11 @@ const CreateGame = (maxPlayers, playerId, code, db) => {
   return true;
 };
 
+const DeleteGame = (playerId, db, e) => {
+  db('GAMES').delete().where(e.eq('playerid', playerId)).all();
+  localStorage.setItem(LocalStorageKeys.GameId, null);
+};
+
 const GameIdByCode = async (code, db, e) => {
   const game = await db('GAMES').return('playerid').where(e.eq('code', code)).one();
 
@@ -16,4 +21,4 @@ const GameIdByCode = async (code, db, e) => {
   }
 };
 
-export { CreateGame, GameIdByCode };
+export { CreateGame, GameIdByCode, DeleteGame };

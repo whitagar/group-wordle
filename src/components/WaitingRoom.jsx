@@ -10,11 +10,16 @@ import {
   clearChat,
   disconnectSocket,
   sendChat,
+  subscribeToRoomDestroyed,
+  subscribeToRoomNotAvailable,
 } from '../services/socket';
+import { DeleteGame } from '../services/GameService';
+import { useEasybase } from 'easybase-react';
 
 const WaitingRoom = () => {
   // eslint-disable-next-line react/prop-types
   const { id } = useParams();
+  const { db, e } = useEasybase();
   const playerId = localStorage[LocalStorageKeys.PlayerId];
   const isHost = playerId === id;
   const [chats, setChats] = useState(JSON.parse(localStorage[LocalStorageKeys.ChatRoomData]) ?? []);
@@ -24,9 +29,13 @@ const WaitingRoom = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    initiateSocket(null);
-    enterRoom(null, username, playerId);
-    subscribeToRoomChat(null, (err, newChats) => {
+    initiateSocket(id);
+    subscribeToRoomNotAvailable(id, () => {
+      console.log('Room is not available right now');
+      navigate('/');
+    });
+    enterRoom(id, username, playerId);
+    subscribeToRoomChat(id, (err, newChats) => {
       if (err) {
         return;
       }
@@ -34,7 +43,7 @@ const WaitingRoom = () => {
       setChats(newChats);
     });
 
-    subscribeToRoomPlayersList(null, (err, newPlayersList) => {
+    subscribeToRoomPlayersList(id, (err, newPlayersList) => {
       if (err) {
         return;
       }
@@ -42,8 +51,14 @@ const WaitingRoom = () => {
       setPlayersList(newPlayersList);
     });
 
+    subscribeToRoomDestroyed(id, () => {
+      console.log('Destroying room: ', id);
+      DeleteGame(id, db, e);
+      navigate('/');
+    });
+
     return () => {
-      disconnectSocket();
+      disconnectSocket(id);
     };
   }, []);
 
@@ -58,11 +73,11 @@ const WaitingRoom = () => {
   };
 
   const handleClearChat = () => {
-    clearChat(null);
+    clearChat(id);
   };
 
   const handleSubmitChat = () => {
-    sendChat(null, typedMessage, username);
+    sendChat(id, typedMessage, username);
     setTypedMessage('');
   };
 

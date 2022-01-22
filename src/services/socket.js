@@ -7,18 +7,18 @@ const socket = socketIOClient(serverEndpoint, {
   transports: ['websocket'],
 });
 
-export const initiateSocket = (room) => {
+export const initiateSocket = (roomId) => {
   console.log('Connecting socket...');
 };
 
-export const disconnectSocket = () => {
+export const disconnectSocket = (roomId) => {
   console.log('Disconnecting socket...');
   if (socket) {
-    socket.disconnect();
+    socket.disconnect(roomId);
   }
 };
 
-export const subscribeToRoomChat = (room, callback) => {
+export const subscribeToRoomChat = (roomId, callback) => {
   if (!socket) {
     return true;
   }
@@ -28,21 +28,41 @@ export const subscribeToRoomChat = (room, callback) => {
   });
 };
 
-export const subscribeToRoomPlayersList = (room, callback) => {
+export const subscribeToRoomPlayersList = (roomId, callback) => {
   socket.on('RetrievePlayersList', (list) => {
     localStorage.setItem(LocalStorageKeys.PlayersList, JSON.stringify(list));
     return callback(null, list);
   });
 };
 
-export const enterRoom = (room, username, playerId) => {
-  socket.emit('UserEnteredRoom', { username: username, id: playerId });
+export const enterRoom = (roomId, username, playerId) => {
+  socket.emit('UserEnteredRoom', { username: username, id: playerId }, roomId);
 };
 
-export const clearChat = (room) => {
-  socket.emit('ClearChat');
+export const clearChat = (roomId) => {
+  socket.emit('ClearChat', roomId);
 };
 
-export const sendChat = (room, message, username) => {
-  socket.emit('SendMessage', { message: message, username: username });
+export const sendChat = (roomId, message, username) => {
+  socket.emit('SendMessage', { message: message, username: username }, roomId);
+};
+
+export const subscribeToRoomDestroyed = (roomId, callback) => {
+  socket.on('RoomDestroyed', () => {
+    localStorage.setItem(LocalStorageKeys.PlayersList, JSON.stringify([]));
+    localStorage.setItem(LocalStorageKeys.ChatRoomData, JSON.stringify([]));
+    return callback();
+  });
+};
+
+export const subscribeToRoomNotAvailable = (roomId, callback) => {
+  socket.on('RoomNotAvailable', () => {
+    localStorage.setItem(LocalStorageKeys.PlayersList, JSON.stringify([]));
+    localStorage.setItem(LocalStorageKeys.ChatRoomData, JSON.stringify([]));
+    return callback();
+  });
+};
+
+export const createRoom = (roomId) => {
+  socket.emit('CreateRoom', roomId);
 };
