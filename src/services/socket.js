@@ -1,7 +1,8 @@
 import socketIOClient from 'socket.io-client';
 import { LocalStorageKeys } from '../util/LocalStorageKeys';
 
-const serverEndpoint = 'wss://safe-cliffs-76740.herokuapp.com:3080';
+const port = 37378;
+const serverEndpoint = `wss://safe-cliffs-76740.herokuapp.com:${port}`;
 
 const socket = socketIOClient(serverEndpoint, {
   transports: ['websocket'],
