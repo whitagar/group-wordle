@@ -30,8 +30,8 @@ export function Play() {
   const { db, e } = useEasybase();
   const playerId = localStorage[LocalStorageKeys.PlayerId];
   const isHost = playerId === id;
-  const [chats, setChats] = useState(JSON.parse(localStorage[LocalStorageKeys.ChatRoomData]) ?? []);
-  const [playersList, setPlayersList] = useState(JSON.parse(localStorage[LocalStorageKeys.PlayersList]) ?? []);
+  const [chats, setChats] = useState([]);
+  const [playersList, setPlayersList] = useState([]);
   const username = localStorage[LocalStorageKeys.Username];
   const navigate = useNavigate();
   // eslint-disable-next-line no-unused-vars
