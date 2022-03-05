@@ -8,7 +8,7 @@ app.use(express.static(path.join(__dirname, "build")));
 app.use(express.static("public"));
 
 // Running our server on port 10986
-var PORT = process.env.PORT || 10986;
+const PORT = process.env.PORT || 8080;
 
 var server = app.listen(PORT, function () {
   var port = server.address().port;

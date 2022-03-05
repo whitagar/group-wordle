@@ -3,7 +3,7 @@ import { LocalStorageKeys } from '../util/LocalStorageKeys';
 
 var socket;
 
-export const initiateSocket = (roomId) => {
+export const initiateSocket = () => {
   socket = io();
   console.log('Connecting socket...');
 };
