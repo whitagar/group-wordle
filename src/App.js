@@ -6,8 +6,15 @@ import Create from './components/Create';
 import { Button } from '@mui/material';
 import Guess from './components/Play/Guess/Guess';
 import { Play } from './components/Play/Play';
+import { useEffect } from 'react';
+import { disconnectSocket, initiateSocket } from './services/socket';
 
 function App() {
+  useEffect(() => {
+    initiateSocket();
+
+    return () => disconnectSocket();
+  }, []);
   return (
     <main>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />

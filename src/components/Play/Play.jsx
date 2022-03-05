@@ -3,7 +3,6 @@ import { Routes, Route, useParams } from 'react-router-dom';
 import WaitingRoom from '../WaitingRoom';
 import { PlayGame } from './PlayGame';
 import {
-  initiateSocket,
   subscribeToRoomNotAvailable,
   enterRoom,
   subscribeToRoomChat,
@@ -37,7 +36,6 @@ export function Play() {
   const [getWordsMap, setWordsMap] = useWordsMap();
 
   useEffect(() => {
-    initiateSocket(id);
     setChats([]);
     setPlayersList([]);
     subscribeToRoomNotAvailable(id, () => {
