@@ -1,15 +1,10 @@
-import socketIOClient from 'socket.io-client';
-import { PORT } from '../../server';
+import { io } from 'socket.io-client';
 import { LocalStorageKeys } from '../util/LocalStorageKeys';
 
-// Default heroku port
-const serverEndpoint = `ws://localhost:${PORT}`;
-
-const socket = socketIOClient(serverEndpoint, {
-  transports: ['websocket'],
-});
+var socket;
 
 export const initiateSocket = (roomId) => {
+  socket = io();
   console.log('Connecting socket...');
 };
 
