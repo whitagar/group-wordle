@@ -13,7 +13,7 @@ export function ChooseWord() {
   const handleSubmitWord = () => {
     if (typedWord.length !== 5) {
       setErrorMessage('Length of word must be 5 letters');
-    } else if (DictionaryService.isValidWordFast(typedWord)) {
+    } else if (DictionaryService.isValidWordWithTrie(typedWord)) {
       console.log('Setting word for this user with room ID: ', id);
       setWord(id, typedWord);
       setWordSubmitted(true);

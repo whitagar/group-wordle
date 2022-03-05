@@ -1,3 +1,5 @@
+import { TrieWithFiveLetters } from '../util/Trie';
+
 export class DictionaryService {
   static async isValidWord(word) {
     const url = 'https://api.dictionaryapi.dev/api/v2/entries/en/' + word;
@@ -13,5 +15,10 @@ export class DictionaryService {
     const checkWord = require('check-if-word');
     const words = checkWord('en');
     return words.check(word);
+  }
+
+  static async isValidWordWithTrie(word) {
+    const trie = TrieWithFiveLetters();
+    return trie.contains(word);
   }
 }

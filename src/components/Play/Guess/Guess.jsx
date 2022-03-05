@@ -129,7 +129,7 @@ function Guess({ chances, numLetters, givenWord }) {
       if (currentLetterIndex < numLetters - 1) {
         return;
       } else {
-        const isValid = DictionaryService.isValidWordFast(guesses[currentGuess - 1].join(''));
+        const isValid = DictionaryService.isValidWordWithTrie(guesses[currentGuess - 1].join(''));
         if (isValid) {
           let guessedCorrectly = guesses[currentGuess - 1].every((letter, index) => {
             return letter.toLowerCase() === word.toLowerCase().charAt(index);
