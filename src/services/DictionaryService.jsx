@@ -17,7 +17,7 @@ export class DictionaryService {
     return words.check(word);
   }
 
-  static async isValidWordWithTrie(word) {
+  static isValidWordWithTrie(word) {
     const trie = TrieWithFiveLetters();
     return trie.contains(word);
   }
