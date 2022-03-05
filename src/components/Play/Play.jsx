@@ -97,8 +97,6 @@ export function Play() {
       console.log('starting new round...');
       navigate(`/game/play/${id}/playGame/${playerId}`);
     });
-
-    return () => disconnectSocket(id);
   }, []);
 
   const handleStartGame = () => {
