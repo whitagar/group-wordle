@@ -96,7 +96,7 @@ export function Play() {
       console.log('starting new round...');
       navigate(`/game/play/${id}/playGame/${playerId}`);
     });
-  });
+  }, []);
 
   const handleStartGame = () => {
     hostStartGame(id);
