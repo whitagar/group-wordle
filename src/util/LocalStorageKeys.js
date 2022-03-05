@@ -6,4 +6,10 @@ export const LocalStorageKeys = {
   Username: 'username',
   ChatRoomData: 'chatroomdata',
   PlayersList: 'playerslist',
+  Guesses: 'guesses',
+  CurrentGuess: 'currentguess',
+  FinalScores: 'finalscores',
+  WinningUsername: 'winningusername',
+  HighScore: 'highscore',
+  WordsMap: 'wordsmap',
 };

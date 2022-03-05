@@ -36,7 +36,11 @@ export const subscribeToRoomPlayersList = (roomId, callback) => {
 };
 
 export const enterRoom = (roomId, username, playerId) => {
-  socket.emit('UserEnteredRoom', { username: username, id: playerId }, roomId);
+  socket.emit(
+    'UserEnteredRoom',
+    { username: username, id: playerId, hasWord: false, word: '', turnTaken: false, scores: {} },
+    roomId
+  );
 };
 
 export const clearChat = (roomId) => {
@@ -65,4 +69,43 @@ export const subscribeToRoomNotAvailable = (roomId, callback) => {
 
 export const createRoom = (roomId) => {
   socket.emit('CreateRoom', roomId);
+};
+
+export const hostStartGame = (roomId) => {
+  socket.emit('HostStartGame', roomId);
+  console.log('Host started game... launching soon');
+};
+
+export const subscribeToStartGame = (roomId, callback) => {
+  socket.on('StartGame', () => {
+    return callback();
+  });
+};
+
+export const setWord = (roomId, word) => {
+  socket.emit('SetWord', roomId, word);
+  console.log('Congrats, you chose your word. Now wait for all players to choose theirs!');
+};
+
+export const subscribeToStartRound = (callback) => {
+  socket.on('StartRound', (word, id) => {
+    return callback(word, id);
+  });
+};
+
+export const subscribeToGameOver = (callback) => {
+  socket.on('GameOver', (allScores, maxScore, winningUsername) => {
+    callback(allScores, maxScore, winningUsername);
+  });
+};
+
+export const subscribeToSetWordsMap = (callback) => {
+  socket.on('SetWordsMap', (wordsMap) => {
+    callback(wordsMap);
+  });
+};
+
+export const setRoundScore = (roomId, roundId, score) => {
+  socket.emit('SetRoundScore', roomId, roundId, score);
+  console.log('You got a score of: ', score);
 };

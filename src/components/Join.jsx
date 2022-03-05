@@ -19,7 +19,7 @@ const Join = () => {
   useEffect(() => {
     if (gameId && username) {
       CreatePlayer(username, gameId, db);
-      navigate(`/game/wait/${gameId}`);
+      navigate(`/game/play/${gameId}/wait`);
     }
   }, [gameId, username, navigate, db]);
 

@@ -1,66 +1,13 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { LocalStorageKeys } from '../util/LocalStorageKeys';
 import { Button, TextField, Typography } from '@mui/material';
-import {
-  initiateSocket,
-  subscribeToRoomChat,
-  subscribeToRoomPlayersList,
-  enterRoom,
-  clearChat,
-  disconnectSocket,
-  sendChat,
-  subscribeToRoomDestroyed,
-  subscribeToRoomNotAvailable,
-} from '../services/socket';
-import { DeleteGame } from '../services/GameService';
-import { useEasybase } from 'easybase-react';
+import { PropTypes } from 'prop-types';
 
-const WaitingRoom = () => {
+const WaitingRoom = ({ chats, isHost, playersList, username, playerId, onSendChat, onStartGame, onClearChats }) => {
   // eslint-disable-next-line react/prop-types
-  const { id } = useParams();
-  const { db, e } = useEasybase();
-  const playerId = localStorage[LocalStorageKeys.PlayerId];
-  const isHost = playerId === id;
-  const [chats, setChats] = useState(JSON.parse(localStorage[LocalStorageKeys.ChatRoomData]) ?? []);
-  const [playersList, setPlayersList] = useState(JSON.parse(localStorage[LocalStorageKeys.PlayersList]) ?? []);
   const [typedMessage, setTypedMessage] = useState('');
-  const username = localStorage[LocalStorageKeys.Username];
   const navigate = useNavigate();
-
-  useEffect(() => {
-    initiateSocket(id);
-    subscribeToRoomNotAvailable(id, () => {
-      console.log('Room is not available right now');
-      navigate('/');
-    });
-    enterRoom(id, username, playerId);
-    subscribeToRoomChat(id, (err, newChats) => {
-      if (err) {
-        return;
-      }
-
-      setChats(newChats);
-    });
-
-    subscribeToRoomPlayersList(id, (err, newPlayersList) => {
-      if (err) {
-        return;
-      }
-
-      setPlayersList(newPlayersList);
-    });
-
-    subscribeToRoomDestroyed(id, () => {
-      console.log('Destroying room: ', id);
-      DeleteGame(id, db, e);
-      navigate('/');
-    });
-
-    return () => {
-      disconnectSocket(id);
-    };
-  }, []);
 
   useEffect(() => {
     if (!localStorage.getItem(LocalStorageKeys.PlayerId)) {
@@ -69,15 +16,15 @@ const WaitingRoom = () => {
   });
 
   const handleStartGame = () => {
-    navigate(`/game/play/${id}`);
+    onStartGame();
   };
 
   const handleClearChat = () => {
-    clearChat(id);
+    onClearChats();
   };
 
   const handleSubmitChat = () => {
-    sendChat(id, typedMessage, username);
+    onSendChat(typedMessage);
     setTypedMessage('');
   };
 
@@ -134,6 +81,17 @@ const WaitingRoom = () => {
       </Button>
     </div>
   );
+};
+
+WaitingRoom.propTypes = {
+  chats: PropTypes.array.isRequired,
+  playersList: PropTypes.array.isRequired,
+  isHost: PropTypes.bool.isRequired,
+  username: PropTypes.string.isRequired,
+  playerId: PropTypes.string.isRequired,
+  onSendChat: PropTypes.func.isRequired,
+  onStartGame: PropTypes.func.isRequired,
+  onClearChats: PropTypes.func.isRequired,
 };
 
 export default WaitingRoom;

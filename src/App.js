@@ -3,8 +3,9 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import Home from './components/Home';
 import Join from './components/Join';
 import Create from './components/Create';
-import WaitingRoom from './components/WaitingRoom';
 import { Button } from '@mui/material';
+import Guess from './components/Play/Guess/Guess';
+import { Play } from './components/Play/Play';
 
 function App() {
   return (
@@ -15,7 +16,8 @@ function App() {
       <Routes>
         <Route path="/create" element={<Create />} />
         <Route path="/join" element={<Join />} />
-        <Route path="/game/wait/:id" element={<WaitingRoom />} />
+        <Route path="/game/play/:id/*" element={<Play />} />
+        <Route path="/play/test" element={<Guess word={'monkey'} chances={6} numLetters={6} />} />
         <Route path="/" element={<Home />} exact />
         <Route element={Home} />
       </Routes>

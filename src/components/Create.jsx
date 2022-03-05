@@ -10,11 +10,19 @@ import { createRoom } from '../services/socket';
 function Create() {
   const { db } = useEasybase();
   const navigate = useNavigate();
+  let name;
+  let playerId;
 
   const handleCreateGame = () => {
-    const name = prompt('Choose a username');
-    const playerId = name.hashCode();
-    CreatePlayer(name, playerId, db);
+    if (localStorage[LocalStorageKeys.Username]) {
+      const storedName = localStorage[LocalStorageKeys.Username];
+      name = storedName;
+      playerId = storedName.hashCode();
+    } else {
+      name = prompt('Choose a username');
+      playerId = name.hashCode();
+      CreatePlayer(name, playerId, db);
+    }
     let numPlayers;
     while (!numPlayers || isNaN(numPlayers)) {
       numPlayers = parseInt(prompt('How many players'));
@@ -26,7 +34,7 @@ function Create() {
     localStorage.setItem(LocalStorageKeys.PlayerId, playerId);
     localStorage.setItem(LocalStorageKeys.IsHost, true);
     localStorage.setItem(LocalStorageKeys.GameId, playerId);
-    navigate(`/game/wait/${playerId}`);
+    navigate(`/game/play/${playerId}/wait`);
   };
 
   return (

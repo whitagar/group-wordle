@@ -24,6 +24,14 @@ function Home() {
       >
         Join a game
       </Button>
+      <Button
+        variant="outlined"
+        onClick={() => {
+          navigate('/play/test', { replace: true });
+        }}
+      >
+        Test game
+      </Button>
     </div>
   );
 }
