@@ -1,8 +1,8 @@
 import { Button, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { DictionaryService } from '../../services/DictionaryService';
-import { setWord } from '../../services/socket';
+import { DictionaryService } from '../../../../services/DictionaryService';
+import { setWord } from '../../../../services/socket';
 
 export function ChooseWord() {
   const [typedWord, setTypedWord] = useState('');

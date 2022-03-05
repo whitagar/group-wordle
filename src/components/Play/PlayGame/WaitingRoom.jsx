@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { LocalStorageKeys } from '../util/LocalStorageKeys';
+import { LocalStorageKeys } from '../../../util/LocalStorageKeys';
 import { Button, TextField, Typography } from '@mui/material';
 import { PropTypes } from 'prop-types';
 

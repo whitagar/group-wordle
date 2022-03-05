@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
-import { ChooseWord } from './ChooseWord';
-import Guess from './Guess/Guess';
+import { ChooseWord } from './StartGame/ChooseWord';
+import Guess from '../Guess/Guess';
 import { RoundStart } from './RoundStart';
 
 export function PlayGame() {

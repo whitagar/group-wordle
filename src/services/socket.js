@@ -106,3 +106,8 @@ export const setRoundScore = (roomId, roundId, score) => {
   socket.emit('SetRoundScore', roomId, roundId, score);
   console.log('You got a score of: ', score);
 };
+
+export const leaveRoom = (roomId) => {
+  socket.emit('LeaveRoom', roomId);
+  console.log('You left the room.');
+};

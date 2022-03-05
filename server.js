@@ -79,6 +79,29 @@ io.on("connection", (client) => {
     }
   });
 
+  client.on("LeaveRoom", (roomId) => {
+    const userData = connectedClients[client.id];
+    let room = rooms[roomId];
+    if (!room) {
+      kick(client);
+      return;
+    }
+    console.log(userData.username + " is leaving room...");
+    const newClientsInRoom = room.clientsInRoom.filter(
+      (c) => c.id !== client.id
+    );
+    room["clientsInRoom"] = newClientsInRoom;
+    var leftRoomMessage = {
+      message: `${userData.username} has left the game`,
+      username: userData.username,
+      userID: userData.id,
+      timeStamp: new Date(),
+    };
+    room.chatRoomData.push(leftRoomMessage);
+    sendUpdatedChatRoomData(room);
+    sendUpdatedPlayersList(room);
+  });
+
   //Player Disconnecting from chat room...
   client.on("disconnecting", (roomId) => {
     let room = rooms[roomId];
@@ -96,7 +119,7 @@ io.on("connection", (client) => {
         userID: 0,
         timeStamp: null,
       };
-      room.clientsInRoom = room.clientsInRoom.filter(
+      room["clientsInRoom"] = room.clientsInRoom.filter(
         (c) => connectedClients[c.id] !== connectedClients[client.id]
       );
       room.chatRoomData.push(leftRoomMessage);

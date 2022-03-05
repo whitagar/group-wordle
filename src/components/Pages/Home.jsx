@@ -11,14 +11,6 @@ function Home() {
       <Button
         variant="contained"
         onClick={() => {
-          navigate('/create', { replace: true });
-        }}
-      >
-        Create a game
-      </Button>
-      <Button
-        variant="contained"
-        onClick={() => {
           navigate('/join', { replace: true });
         }}
       >
@@ -27,10 +19,10 @@ function Home() {
       <Button
         variant="outlined"
         onClick={() => {
-          navigate('/play/test', { replace: true });
+          navigate('/create', { replace: true });
         }}
       >
-        Test game
+        Create a game
       </Button>
     </div>
   );

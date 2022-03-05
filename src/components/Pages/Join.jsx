@@ -2,9 +2,9 @@ import { Button, Typography } from '@mui/material';
 import { useEasybase } from 'easybase-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GameIdByCode } from '../services/GameService';
-import { CreatePlayer } from '../services/PlayerService';
-import { LocalStorageKeys } from '../util/LocalStorageKeys';
+import { GameIdByCode } from '../../services/GameService';
+import { CreatePlayer } from '../../services/PlayerService';
+import { LocalStorageKeys } from '../../util/LocalStorageKeys';
 
 const Join = () => {
   const { db, e } = useEasybase();

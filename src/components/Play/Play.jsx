@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, useParams } from 'react-router-dom';
-import WaitingRoom from '../WaitingRoom';
-import { PlayGame } from './PlayGame';
+import WaitingRoom from './PlayGame/WaitingRoom';
+import { PlayGame } from './PlayGame/PlayGame';
 import {
   subscribeToRoomNotAvailable,
   enterRoom,
@@ -15,6 +15,7 @@ import {
   clearChat,
   hostStartGame,
   sendChat,
+  leaveRoom,
 } from '../../services/socket';
 import { useNavigate } from 'react-router-dom';
 import { LocalStorageKeys } from '../../util/LocalStorageKeys';
@@ -94,7 +95,11 @@ export function Play() {
       console.log('starting new round...');
       navigate(`/game/play/${id}/playGame/${playerId}`);
     });
-  }, []);
+
+    return () => {
+      leaveRoom(id);
+    };
+  }, [db, e, id, isHost, navigate, playerId, setWordsMap, username]);
 
   const handleStartGame = () => {
     hostStartGame(id);

@@ -1,11 +1,11 @@
 /* eslint-disable no-extend-native */
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { CreateGame } from '../services/GameService';
-import { CreatePlayer } from '../services/PlayerService';
+import { CreateGame } from '../../services/GameService';
+import { CreatePlayer } from '../../services/PlayerService';
 import { useEasybase } from 'easybase-react';
-import { LocalStorageKeys } from '../util/LocalStorageKeys';
-import { createRoom } from '../services/socket';
+import { LocalStorageKeys } from '../../util/LocalStorageKeys';
+import { createRoom } from '../../services/socket';
 
 function Create() {
   const { db } = useEasybase();
