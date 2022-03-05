@@ -7,8 +7,8 @@ var path = require("path");
 app.use(express.static(path.join(__dirname, "build")));
 app.use(express.static("public"));
 
-// Running our server on port 37378
-var PORT = process.env.PORT || 37378;
+// Running our server on port 10986
+var PORT = process.env.PORT || 10986;
 
 var server = app.listen(PORT, function () {
   var port = server.address().port;
