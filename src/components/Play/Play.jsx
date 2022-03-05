@@ -16,7 +16,6 @@ import {
   clearChat,
   hostStartGame,
   sendChat,
-  disconnectSocket,
 } from '../../services/socket';
 import { useNavigate } from 'react-router-dom';
 import { LocalStorageKeys } from '../../util/LocalStorageKeys';
