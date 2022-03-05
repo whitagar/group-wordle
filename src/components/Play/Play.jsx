@@ -16,6 +16,7 @@ import {
   clearChat,
   hostStartGame,
   sendChat,
+  disconnectSocket,
 } from '../../services/socket';
 import { useNavigate } from 'react-router-dom';
 import { LocalStorageKeys } from '../../util/LocalStorageKeys';
@@ -97,8 +98,8 @@ export function Play() {
       navigate(`/game/play/${id}/playGame/${playerId}`);
     });
 
-    return () => {};
-  }, []);
+    return () => disconnectSocket(id);
+  });
 
   const handleStartGame = () => {
     hostStartGame(id);
