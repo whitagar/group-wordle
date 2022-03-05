@@ -1,6 +1,7 @@
 import socketIOClient from 'socket.io-client';
 import { LocalStorageKeys } from '../util/LocalStorageKeys';
 
+// Default heroku port
 const port = 37378;
 const serverEndpoint = `ws://localhost:${port}`;
 
