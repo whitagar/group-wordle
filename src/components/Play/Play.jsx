@@ -96,10 +96,8 @@ export function Play() {
       navigate(`/game/play/${id}/playGame/${playerId}`);
     });
 
-    return () => {
-      leaveRoom(id);
-    };
-  }, [db, e, id, isHost, navigate, playerId, setWordsMap, username]);
+    return () => leaveRoom(id);
+  }, []);
 
   const handleStartGame = () => {
     hostStartGame(id);

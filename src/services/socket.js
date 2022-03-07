@@ -6,13 +6,32 @@ var socket;
 export const initiateSocket = () => {
   socket = io();
   console.log('Connecting socket...');
+  subscribeToConnect();
 };
 
-export const disconnectSocket = (roomId) => {
+export const disconnectSocket = () => {
   console.log('Disconnecting socket...');
   if (socket) {
-    socket.disconnect(roomId);
+    socket.disconnect();
   }
+};
+
+export const subscribeToConnect = () => {
+  socket.on('connect', () => {
+    if (localStorage.getItem(LocalStorageKeys.PlayerId)) {
+      checkForCurrentGame(localStorage.getItem(LocalStorageKeys.PlayerId));
+    }
+  });
+};
+
+export const checkForCurrentGame = (userId) => {
+  socket.emit('CheckForCurrentGame', userId);
+};
+
+export const subscribeToRejoinGame = (callback) => {
+  socket.on('RejoinGame', (roomId, word, id, hasGuessedThisRound) => {
+    callback(roomId, word, id, hasGuessedThisRound);
+  });
 };
 
 export const subscribeToRoomChat = (roomId, callback) => {
@@ -86,6 +105,12 @@ export const setWord = (roomId, word) => {
 
 export const subscribeToStartRound = (callback) => {
   socket.on('StartRound', (word, id) => {
+    return callback(word, id);
+  });
+};
+
+export const subscribeToRejoinRound = (callback) => {
+  socket.on('RejoinRound', (word, id) => {
     return callback(word, id);
   });
 };

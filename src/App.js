@@ -6,15 +6,31 @@ import Create from './components/Pages/Create';
 import { Button } from '@mui/material';
 import { Play } from './components/Play/Play';
 import { useEffect } from 'react';
-import { disconnectSocket, initiateSocket } from './services/socket';
+import { disconnectSocket, initiateSocket, subscribeToRejoinGame } from './services/socket';
+import { LocalStorageKeys } from './util/LocalStorageKeys';
 
 function App() {
+  const navigate = useNavigate();
   useEffect(() => {
     initiateSocket();
+    subscribeToRejoinGame((roomId, word, id, hasGuessedThisRound) => {
+      if (hasGuessedThisRound) {
+        navigate(`/game/play/${roomId}/wait`);
+      } else {
+        let guessesArray = [];
+        for (let i = 0; i < 6; ++i) {
+          let guess = Array(word.length).fill('-');
+          guessesArray.push(guess);
+        }
+        localStorage.setItem(LocalStorageKeys.Guesses, JSON.stringify(guessesArray));
+        localStorage.setItem(LocalStorageKeys.CurrentGuess, JSON.stringify(1));
+        localStorage.setItem(LocalStorageKeys.Score, JSON.stringify({ score: 0 }));
+        console.log('starting new round...');
+        navigate(`/game/play/${roomId}/playGame/${id}`);
+      }
+    });
 
-    return () => {
-      disconnectSocket();
-    };
+    return () => disconnectSocket();
   }, []);
   return (
     <main>

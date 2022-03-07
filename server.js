@@ -52,7 +52,15 @@ io.on("connection", (client) => {
 
   //Client created room
   client.on("CreateRoom", (roomId) => {
-    rooms[roomId] = { id: roomId, clientsInRoom: [], chatRoomData: [] };
+    rooms[roomId] = {
+      id: roomId,
+      clientsInRoom: [],
+      chatRoomData: [],
+      playersInGame: {},
+      gameHasStarted: false,
+      gameHasFinished: false,
+      currentRound: {},
+    };
     console.log("Created room: ", roomId);
   });
 
@@ -103,14 +111,26 @@ io.on("connection", (client) => {
   });
 
   //Player Disconnecting from chat room...
-  client.on("disconnecting", (roomId) => {
-    let room = rooms[roomId];
+  client.on("disconnecting", () => {
     console.log("Client disconnecting...");
-
-    if (!room) {
-      kick(client);
+    if (!connectedClients[client.id]) {
       return;
     }
+    const userId = connectedClients[client.id]?.id;
+    let room;
+    let roomId;
+
+    Object.entries(rooms).some((roomObject) => {
+      roomId = roomObject[0];
+      room = roomObject[1];
+      const player = Object.values(room.playersInGame).find((player) => {
+        return player.id === userId;
+      });
+      if (player) {
+        return true;
+      }
+      return false;
+    });
 
     if (connectedClients[client.id]) {
       var leftRoomMessage = {
@@ -120,7 +140,7 @@ io.on("connection", (client) => {
         timeStamp: null,
       };
       room["clientsInRoom"] = room.clientsInRoom.filter(
-        (c) => connectedClients[c.id] !== connectedClients[client.id]
+        (c) => c.id !== client.id
       );
       room.chatRoomData.push(leftRoomMessage);
       if (room.id === connectedClients[client.id].id) {
@@ -154,6 +174,10 @@ io.on("connection", (client) => {
       kick(client);
       return;
     }
+    room.clientsInRoom.forEach((client) => {
+      const userData = connectedClients[client.id];
+      room.playersInGame[userData.id] = userData;
+    });
     sendStartGame(room);
   });
 
@@ -182,10 +206,27 @@ io.on("connection", (client) => {
     userData.scores[roundId] = score;
 
     connectedClients[client.id] = userData;
+    room.playersInGame[userData.id] = userData;
     console.log(
       `${userData.username} got a score of ${score} in round ${roundId}`
     );
     checkIfAllPlayersHaveRoundScore(roomId, roundId);
+  });
+
+  client.on("CheckForCurrentGame", (userId) => {
+    Object.entries(rooms).some((roomObject) => {
+      const roomId = roomObject[0];
+      const room = roomObject[1];
+      const player = Object.values(room.playersInGame).find((player) => {
+        return player.id === userId;
+      });
+      if (player) {
+        connectedClients[client.id] = player;
+        RejoinGame(client, roomId);
+        return true;
+      }
+      return false;
+    });
   });
 });
 
@@ -226,6 +267,7 @@ function kick(client) {
 }
 
 function sendStartGame(room) {
+  room.gameHasStarted = true;
   room.clientsInRoom.forEach((c) => {
     c.emit("StartGame");
   });
@@ -257,6 +299,16 @@ function checkIfAllPlayersHaveRoundScore(roomId, roundId) {
       return roundId in connectedClients[c.id].scores;
     })
   ) {
+    console.log("players in game: ", room.playersInGame);
+    Object.values(room.playersInGame).forEach((player) => {
+      if (!player["scores"]) {
+        room.playersInGame[player.id].scores = {
+          [roundId]: 0,
+        };
+      } else if (!(roundId in player.scores)) {
+        room.playersInGame[player.id].scores[roundId] = 0;
+      }
+    });
     console.log("All players have round score. Moving to next round.");
     startNextRound(roomId);
   } else {
@@ -271,15 +323,16 @@ function startNextRound(roomId) {
       return connectedClients[c.id].turnTaken;
     })
   ) {
+    room.gameHasFinished = true;
     let allScores = {};
     let maxScore = 0;
     let winningUsername = "";
-    room.clientsInRoom.forEach((c) => {
-      const totalScore = Object.values(connectedClients[c.id].scores).reduce(
+    Object.values(room.playersInGame).forEach((player) => {
+      const totalScore = Object.values(player.scores).reduce(
         (partialSum, score) => partialSum + score,
         0
       );
-      const username = connectedClients[c.id].username;
+      const username = player.username;
       allScores[username] = totalScore;
       if (totalScore >= maxScore) {
         maxScore = totalScore;
@@ -296,13 +349,52 @@ function startNextRound(roomId) {
       return !connectedClients[c.id].turnTaken;
     });
     connectedClients[nextPlayer.id].turnTaken = true;
+    room.playersInGame[connectedClients[nextPlayer.id].id].turnTaken = true;
+    const word = connectedClients[nextPlayer.id].word;
+    const id = connectedClients[nextPlayer.id].id;
     room.clientsInRoom.forEach((c) => {
-      c.emit(
-        "StartRound",
-        connectedClients[nextPlayer.id].word,
-        connectedClients[nextPlayer.id].id
+      c.emit("StartRound", word, id);
+    });
+    room.currentRound = { word: word, id: id };
+    console.log("Starting new round...");
+  }
+}
+
+function RejoinGame(client, roomId) {
+  const userData = connectedClients[client.id];
+  console.log("client entered room", userData);
+  let room = rooms[roomId];
+  if (!room) {
+    kick(client);
+    return;
+  }
+  var enteredRoomMessage = {
+    message: `${userData.username} has entered the waiting room`,
+    username: userData.username,
+    userID: userData.id,
+    timeStamp: new Date(),
+  };
+  if (room && !room.gameHasFinished) {
+    room.chatRoomData.push(enteredRoomMessage);
+    room.clientsInRoom = room.clientsInRoom.filter((c) => {
+      return (
+        connectedClients[c.id].username !== connectedClients[client.id].username
       );
     });
-    console.log("Starting new round...");
+    room.clientsInRoom.push(client);
+    console.log("Found unfinished game for player. room: ", room);
+    console.log("new list of clients in room: ", room.clientsInRoom);
+    sendUpdatedChatRoomData(room);
+    sendUpdatedPlayersList(room);
+  }
+  if (room && room.gameHasStarted) {
+    const hasGuessedThisRound = room.currentRound.id in userData.scores;
+    client.emit(
+      "RejoinGame",
+      room.id,
+      room.currentRound.word,
+      room.currentRound.id,
+      hasGuessedThisRound
+    );
   }
 }
